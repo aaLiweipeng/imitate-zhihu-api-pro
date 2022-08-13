@@ -52,5 +52,6 @@ usersRouter.get("/:id", userAuth, (ctx) => {
 // 把中间件注册上去
 app.use(router.routes());
 app.use(usersRouter.routes());
+app.use(usersRouter.allowedMethods());
 
 app.listen(3000);
