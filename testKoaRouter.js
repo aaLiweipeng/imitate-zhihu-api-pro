@@ -4,6 +4,7 @@ const app = new Koa();
 const router = new Router();
 const usersRouter = new Router({ prefix: '/users' });
 
+// ----------------------
 // 模拟用户校验  添加了这个实例的中间件，
 // 访问了 被添加了 本中间件的 中间件时，
 // 对应路由的url，只能是users，不能有其他url子字符串
@@ -20,20 +21,50 @@ router.get('/', (ctx) => {
 })
 
 // 处理get接口
-usersRouter.get("/", userAuth, (ctx) => {
-  ctx.body = "koa-router: 这是用户列表";
+usersRouter.get("/", (ctx) => {
+  // ctx.body = "koa-router: 这是用户列表";
+  ctx.body = [{ name: '李雷' }, { name: '马冬梅' }];
 });
 
 // 处理post接口
-usersRouter.post("/", userAuth, (ctx) => {
-  ctx.body = "koa-router: 创建用户";
+usersRouter.post("/", (ctx) => {
+  // ctx.body = "koa-router: 创建用户";
+  ctx.body = { name: '李雷' };
 });
 
 // 处理get接口带参数
-usersRouter.get("/:id", userAuth, (ctx) => {
-  ctx.body = `koa-router: 这是用户${ctx.params.id}`;
+usersRouter.get("/:id", (ctx) => {
+  // ctx.body = `koa-router: 这是用户${ctx.params.id}`;
+  ctx.body = { name: `${ctx.params.id}` };
 });
 
+usersRouter.put("/:id", (ctx) => {
+  ctx.body = { name: "李雷" + `${ctx.params.id}` };
+});
+
+usersRouter.delete("/:id", (ctx) => {
+  ctx.status = 204;
+});
+
+
+// ---------------------- 多中间件demo
+// // 处理get接口
+// usersRouter.get("/", userAuth, (ctx) => {
+//   ctx.body = "koa-router: 这是用户列表";
+// });
+
+// // 处理post接口
+// usersRouter.post("/", userAuth, (ctx) => {
+//   ctx.body = "koa-router: 创建用户";
+// });
+
+// // 处理get接口带参数
+// usersRouter.get("/:id", userAuth, (ctx) => {
+//   ctx.body = `koa-router: 这是用户${ctx.params.id}`;
+// });
+// ----------------------
+
+// ----------------------
 // // 处理get接口
 // router.get("/users", (ctx) => {
 //   ctx.body = "koa-router: 这是用户列表";
@@ -48,6 +79,7 @@ usersRouter.get("/:id", userAuth, (ctx) => {
 // router.get("/users/:id", (ctx) => {
 //   ctx.body = `koa-router: 这是用户${ctx.params.id}`;
 // });
+// ----------------------
 
 // 把中间件注册上去
 app.use(router.routes());
