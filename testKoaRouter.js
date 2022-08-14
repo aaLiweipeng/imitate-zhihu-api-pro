@@ -1,4 +1,5 @@
 const Koa = require("koa"); // 引入的是构造函数
+const bodyParser = require("koa-bodyparser");
 const Router = require("koa-router"); // 引入的是构造函数
 const app = new Koa();
 const router = new Router();
@@ -82,6 +83,7 @@ usersRouter.delete("/:id", (ctx) => {
 // ----------------------
 
 // 把中间件注册上去
+app.use(bodyParser());
 app.use(router.routes());
 app.use(usersRouter.routes());
 app.use(usersRouter.allowedMethods());
