@@ -1,9 +1,13 @@
+/**
+ * 用户模块控制器类
+ */
+
 const dbStorage = [{ name: "李雷" }]; // 内存模拟数据库
 
 class UsersCtl {
   find(ctx) {
     // 模拟一个运行时错误【undefined.undefined】(语法没问题，运行时错误)
-    // a.b
+    a.b
 
     // 直接返回 整个数据对象
     ctx.body = dbStorage;

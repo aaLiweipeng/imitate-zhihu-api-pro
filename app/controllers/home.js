@@ -1,3 +1,7 @@
+/**
+ * 主页模块 控制器类
+ */
+
 class HomeCtl {
   index(ctx) {
     ctx.body = "<h1>HomeCtl  这是主页</h1>";
