@@ -14,6 +14,7 @@ class UsersCtl {
   }
 
   findById(ctx) {
+    // 校验id
     // ctx.params.id * 1  是为了把 String类型 转换成 Number类型
     // 以id为索引取数据
     if (ctx.params.id * 1 > dbStorage.length - 1) {
@@ -24,19 +25,33 @@ class UsersCtl {
   }
 
   create(ctx) {
-    ctx.request.body.map((item) => {
-      dbStorage.push(item);
+    // 用 koa-parameters 校验参数
+    ctx.verifyParams({
+      name: { type: 'string', required: true },
+      age: { type: 'number', required: false }
     });
+    // ctx.request.body.map((item) => {
+    //   dbStorage.push(item);
+    // });
+    dbStorage.push(ctx.request.body);
     ctx.body = ctx.request.body;
   }
 
   update(ctx) {
+    // 校验id
+    if (ctx.params.id * 1 > dbStorage.length - 1) {
+      ctx.throw(412, "先决条件失败：id参数 大于数组长度-1，索引越界了！");
+    }
     //直接用新的数据 覆盖 旧数据
     dbStorage[ctx.params.id * 1] = ctx.request.body;
     ctx.body = ctx.request.body;
   }
 
   delete(ctx) {
+    // 校验id
+    if (ctx.params.id * 1 > dbStorage.length - 1) {
+      ctx.throw(412, "先决条件失败：id参数 大于数组长度-1，索引越界了！");
+    }
     dbStorage.splice(ctx.params.id * 1, 1);
     ctx.status = 204;
   }

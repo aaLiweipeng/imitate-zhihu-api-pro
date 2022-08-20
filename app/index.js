@@ -11,6 +11,9 @@ const routing = require('./routes');
 
 // 引入koa-json-error
 const error = require('koa-json-error');
+// 引入koa-parameter
+const parameter = require('koa-parameter');
+
 // app.use(error());// 默认配置注册
 app.use(
   error({
@@ -22,6 +25,8 @@ app.use(
 );
 
 app.use(bodyParser());
+// 注册 koa-parameter
+app.use(parameter(app));
 routing(app);
 
 app.listen(3000, () => console.log('程序启动在 3000 端口了'));
