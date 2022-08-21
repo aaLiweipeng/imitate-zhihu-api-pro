@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const { Schema } = mongoose;
+const { Schema, model } = mongoose;
 
 // 定义用户 文档“Schema”【面向文档的Schema，不是MySQL的关系型Schema】
 const usesrSchema = new Schema({

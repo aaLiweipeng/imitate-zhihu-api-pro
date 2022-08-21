@@ -14,10 +14,10 @@ const parameter = require('koa-parameter');// 引入koa-parameter
 const mongoose = require('mongoose');// 引入mongoose
 const { connectionStr } = require("./config");
 mongoose.connect(connectionStr, () => console.log("MongoDB 连接成功!!!"));
-// mongoose.connection.on('error', console.error);
+mongoose.connection.on('error', console.error);
 mongoose.connection.on("error", () => {
   console.error;
-  // console.log("MongoDB 连接失败!!!");
+  console.log("MongoDB 连接失败!!!");
 });
 
 // app.use(error());// 默认配置注册
