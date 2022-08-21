@@ -1,0 +1,12 @@
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
+
+// 定义用户 文档“Schema”【面向文档的Schema，不是MySQL的关系型Schema】
+const usesrSchema = new Schema({
+  // 存入数据库时，会自动把数据 转成 type指定的类型；required 为 true，则存数据没这个键会报错
+  name: { type: String, required: true },
+});
+
+// 定义 Schema文档 对应的【文档集合标识】
+module.exports = model('User', usesrSchema);
