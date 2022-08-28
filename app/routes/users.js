@@ -1,6 +1,9 @@
 const Router = require("koa-router"); // 引入的是构造函数
 const usersRouter = new Router({ prefix: "/users" });
-const { find, findById, create, update, delete: del } = require('../controllers/users');
+const {
+  find, findById, create, update,
+  delete: del, login
+} = require('../controllers/users');
 
 // ----------------------
 // 模拟用户校验  添加了这个实例的中间件，
@@ -28,6 +31,8 @@ usersRouter.get("/:id", findById);
 usersRouter.patch("/:id", update);
 
 usersRouter.delete("/:id", del);
+
+usersRouter.post("/login", login);
 // --------------
 
 

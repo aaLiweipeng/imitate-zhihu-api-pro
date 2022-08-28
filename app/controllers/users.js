@@ -2,8 +2,10 @@
  * 用户模块控制器类
  */
 
+const jsonwebtoken = require('jsonwebtoken');
 // const dbStorage = [{ name: "李雷" }]; // 内存模拟数据库
 const User = require('../models/users');// 引入 user Schema
+const { mytokensecret } = require("../config");
 
 class UsersCtl {
   async find(ctx) {
@@ -98,6 +100,26 @@ class UsersCtl {
     // dbStorage.splice(ctx.params.id * 1, 1);
     // ctx.status = 204;
   }
+
+  async login(ctx) {
+    // 用 koa-parameters 校验参数格式
+    ctx.verifyParams({
+      name: { type: "string", required: true },
+      password: { type: "string", required: true },
+    });
+
+    // 校验数据内容
+    const user = await User.findOne(ctx.request.body)
+    if (!user) { ctx.throw(401, '用户名或密码不正确'); }
+
+    // 组装不敏感信息，生成token
+    // expiresIn 有效时长【过期时限】
+    const { _id, name } = user;
+    const token = jsonwebtoken.sign({ _id, name }, mytokensecret, {expiresIn: '1d'});
+    // 把 token 返回给客户端
+    ctx.body = { token };
+  }
+
 }
 
 module.exports = new UsersCtl();
