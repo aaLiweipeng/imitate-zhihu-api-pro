@@ -13,11 +13,12 @@ class UsersCtl {
     // 直接返回 整个数据对象
     // ctx.body = dbStorage;
 
-    // 返回 usersSchema查询
+    // find 返回 usersSchema 整个列表的查询结果
     ctx.body = await User.find();
   }
 
   async findById(ctx) {
+    // findById 根据id 查询数据
     const user = await User.findById(ctx.params.id);
     if (!user) {
       ctx.throw(404, "抱歉，您查询的用户不存在！");
@@ -38,10 +39,18 @@ class UsersCtl {
     // 用 koa-parameters 校验参数
     ctx.verifyParams({
       name: { type: "string", required: true },
+      password: { type: "string", required: true },
     });
 
+    // 数据唯一性处理 需要检验要创建的用户名是否已经存在
+    const { name } = ctx.request.body; // 取到请求数据中的name
+    // findOne 查找数据库，返回符合条件的第一条记录
+    const repeatedUser = await User.findOne({ name });
+    if (repeatedUser) { ctx.throw(409, '用户已存在，请重新定义用户名！') }
+
     // MongoDB存储
-    // 直接把 client传过来的post数据 赋值到UserSchema类，再调用save()即可
+    // 直接把 client传过来的post数据 赋值到UserSchema类，
+    // 再调用save()即可存储数据
     const user = await new User(ctx.request.body).save();
     ctx.body = user; // 返回存进去的数据
 
@@ -55,8 +64,10 @@ class UsersCtl {
   }
 
   async update(ctx) {
+    // 用 koa-parameters 校验参数
     ctx.verifyParams({
-      name: { type: "string", required: true },
+      name: { type: "string", required: false },
+      password: { type: "string", required: false },
     });
     const user = await User.findByIdAndUpdate(ctx.params.id, ctx.request.body);
     if (!user) {

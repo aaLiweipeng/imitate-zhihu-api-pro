@@ -25,7 +25,7 @@ usersRouter.post("/", create);
 // 处理get接口带参数【获取特定用户】
 usersRouter.get("/:id", findById);
 
-usersRouter.put("/:id", update);
+usersRouter.patch("/:id", update);
 
 usersRouter.delete("/:id", del);
 // --------------
