@@ -8,6 +8,17 @@ const User = require('../models/users');// 引入 user Schema
 const { mytokensecret } = require("../config");
 
 class UsersCtl {
+
+  // 进行权限判断 当前登录用户 只能 修改用户自身的信息
+  async checkOwner(ctx, next) {
+    // app\routes\users.js 中，认证成功的用户会存到 ctx.state.user 中
+    // 比较 post传上来的id 与 ctx.state.user认证用户的id
+    if (ctx.params.id !== ctx.state.user._id) {
+      ctx.throw(403, "没有访问权限！");
+    }
+    await next();
+  }
+
   async find(ctx) {
     // 模拟一个运行时错误【undefined.undefined】(语法没问题，运行时错误)
     // a.b
