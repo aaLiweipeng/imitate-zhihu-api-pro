@@ -5,7 +5,7 @@
 const fs = require('fs');
 
 module.exports = (app) => {
-  console.log("readdirSync --- ", fs.readdirSync(__dirname));
+  console.log("app\\routes\\=index readdirSync --- ", fs.readdirSync(__dirname));
   fs.readdirSync(__dirname).map((file) => {
     // 同步读取当前目录（与index.js本文件 同级的目录）下所有文件,
     // 遍历处理
