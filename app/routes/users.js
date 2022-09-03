@@ -1,4 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken');
+const koaJwt = require('koa-jwt');
 const Router = require("koa-router"); // 引入的是构造函数
 const usersRouter = new Router({ prefix: "/users" });
 const {
@@ -9,32 +10,35 @@ const {
 const { mytokensecret } = require("../config");
 
 // 认证用户token 中间件
-const auth = async (ctx, next) => {
+const auth = koaJwt({ secret: mytokensecret });// 一行搞定
+// 因为koa-jwt生成的用户信息，也是放在ctx.state.user上，所以这里不用做过多的调用代码处理
 
-  // ---- 获取token
-  // 从客户端请求的header中 获取token，
-  // 注意header会把键都变成小写的;
-  // 且这里设置了默认值，避免用户没传token时 程序运行出错!
-  const { authorization = "" } = ctx.request.header;
-  const token = authorization.replace("Bearer ", "");
+// const auth = async (ctx, next) => {
 
-  // ----  判空、后续处理
-  // 如果token为空，或者【token数据】被【篡改】，
-  // verify会直接报错，会导致程序停止运行，直接返回500
-  // 所以这里需要做处理，添加捕获保护!!!
-  // 使得对应场景都统一为401【没有认证】错误
-  try {
-    const user = jsonwebtoken.verify(token, mytokensecret);
+//   // ---- 获取token
+//   // 从客户端请求的header中 获取token，
+//   // 注意header会把键都变成小写的;
+//   // 且这里设置了默认值，避免用户没传token时 程序运行出错!
+//   const { authorization = "" } = ctx.request.header;
+//   const token = authorization.replace("Bearer ", "");
 
-    // 认证成功，把用户信息 放入全局
-    ctx.state.user = user;
-  } catch (err) {
-    ctx.throw(401, err.message);
-  }
+//   // ----  判空、后续处理
+//   // 如果token为空，或者【token数据】被【篡改】，
+//   // verify会直接报错，会导致程序停止运行，直接返回500
+//   // 所以这里需要做处理，添加捕获保护!!!
+//   // 使得对应场景都统一为401【没有认证】错误
+//   try {
+//     const user = jsonwebtoken.verify(token, mytokensecret);
 
-  // 执行后续的中间件
-  await next();
-}
+//     // 认证成功，把用户信息 放入全局
+//     ctx.state.user = user;
+//   } catch (err) {
+//     ctx.throw(401, err.message);
+//   }
+
+//   // 执行后续的中间件
+//   await next();
+// }
 
 // ----------------------
 // 模拟用户校验  添加了这个实例的中间件，
