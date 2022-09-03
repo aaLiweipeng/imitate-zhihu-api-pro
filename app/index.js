@@ -1,6 +1,7 @@
 const Koa = require("koa");
 // const bodyParser = require("koa-bodyparser");
-const bodyParser = require("koa-body");
+const koaBody = require("koa-body");
+const koaStatic = require('koa-static');
 const app = new Koa();
 
 const routing = require('./routes'); // routes整体注册模块
@@ -16,13 +17,15 @@ const parameter = require('koa-parameter');// 引入koa-parameter
 
 const mongoose = require('mongoose');// 引入mongoose
 const { connectionStr } = require("./config");
-const koaBody = require("koa-body");
 mongoose.connect(connectionStr, () => console.log("MongoDB 连接成功!!!"));
 mongoose.connection.on('error', console.error);
 mongoose.connection.on("error", () => {
   console.error;
   console.log("MongoDB 连接失败!!!");
 });
+
+//配置静态文件路径
+app.use(koaStatic(path.join(__dirname, 'public')));
 
 // app.use(error());// 默认配置注册
 app.use(
@@ -44,6 +47,7 @@ app.use(koaBody({
     keepExtensions: true, // 保留文件前缀
   },
 }));
+
 // 注册 koa-parameter
 app.use(parameter(app));
 routing(app);

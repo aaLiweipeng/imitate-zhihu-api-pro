@@ -1,3 +1,4 @@
+const path = require("path");
 /**
  * 主页模块 控制器类
  */
@@ -8,7 +9,8 @@ class HomeCtl {
   }
   upload(ctx) {
     const file = ctx.request.files.file; // 取上传过来的file
-    ctx.body = { path: file.filepath }; // 返回 路径给 客户端 用于前端页面渲染
+    const basename = path.basename(file.filepath);
+    ctx.body = { url: `${ctx.origin}/uploads/${basename}` }; // 返回 路径给 客户端 用于前端页面渲染
   }
 }
 
