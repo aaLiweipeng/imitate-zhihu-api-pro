@@ -34,6 +34,10 @@ const usesrSchema = new Schema({
       graduation_year: { type: Number }, // 毕业年份
     }],
     select: false
+  },
+  following: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'User' }], // 存储着id数组，这些id 可以跟 User表 相关联！
+    select : false
   }
 });
 
