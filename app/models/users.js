@@ -16,13 +16,14 @@ const usesrSchema = new Schema({
     required: true,
   },
   headline: { type: String },    // 一句话简介
-  locations: {type: [{type: String}] },  // 居住地 字符串数组
-  business: { type: String },
+  locations: {type: [{type: String}] , select: false},  // 居住地 字符串数组
+  business: { type: String, select: false },
   employments: {                 // 职业经历  对象数组
     type: [{
       company: { type: String },
       job: { type: String },
-    }]
+    }],
+    select: false
   },
   educations: {                 // 教育经历  对象数组
     type: [{
@@ -31,7 +32,8 @@ const usesrSchema = new Schema({
       diploma: { type: Number, enum: [1, 2, 3, 4, 5] }, // 高中及一下，大专，本科，硕士，博士及以上
       entrance_year: { type: Number },   // 入学年份
       graduation_year: { type: Number }, // 毕业年份
-    }]
+    }],
+    select: false
   }
 });
 

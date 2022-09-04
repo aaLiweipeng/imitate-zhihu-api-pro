@@ -31,8 +31,17 @@ class UsersCtl {
   }
 
   async findById(ctx) {
+    const { fields } = ctx.query;
+
+    // filter(field => field)  过滤有实值的field元素 避免;;之间隔着空字符串
+    const selectFields = fields
+      .split(';')
+      .filter(field => field)
+      .map(field => ' +' + field)
+      .join('');
+
     // findById 根据id 查询数据
-    const user = await User.findById(ctx.params.id);
+    const user = await User.findById(ctx.params.id).select(selectFields);
     if (!user) {
       ctx.throw(404, "抱歉，您查询的用户不存在！");
     } // 如果找不到这个用户
