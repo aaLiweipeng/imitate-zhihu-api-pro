@@ -165,6 +165,13 @@ class UsersCtl {
     ctx.body = follower;
   }
 
+  // 校验中间件，校验用户是否存在
+  async checkUserExist(ctx, next) {
+    const user = await User.findById(ctx.params.id);
+    if (!user) { ctx.throw(404, '用户不存在'); }
+    await next();
+  }
+
   // 为 当前操作用户，添加【:id 对应的用户为】关注者
   // auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
   async follow(ctx) {
