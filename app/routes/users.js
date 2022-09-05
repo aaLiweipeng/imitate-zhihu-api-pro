@@ -3,9 +3,16 @@ const koaJwt = require('koa-jwt');
 const Router = require("koa-router"); // 引入的是构造函数
 const usersRouter = new Router({ prefix: "/users" });
 const {
-  find, findById, create, update,
-  delete: del, login, checkOwner
-} = require('../controllers/users');
+  find,
+  findById,
+  create,
+  update,
+  delete: del,
+  login,
+  checkOwner,
+  listFollowing,
+  follow,
+} = require("../controllers/users");
 
 const { mytokensecret } = require("../config");
 
@@ -68,6 +75,14 @@ usersRouter.patch("/:id", auth, checkOwner, update);
 usersRouter.delete("/:id", auth, checkOwner, del);
 
 usersRouter.post("/login", login);
+
+// 获取指定用户的 关注列表
+usersRouter.get("/:id/following", listFollowing);
+
+// 为 auth对应的当前操作用户，添加【:id 对应的用户为】关注者
+// auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
+usersRouter.put("/following/:id", auth, follow);
+
 // --------------
 
 

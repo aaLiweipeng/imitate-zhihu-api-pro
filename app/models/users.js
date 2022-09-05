@@ -36,7 +36,8 @@ const usesrSchema = new Schema({
     select: false
   },
   following: {
-    type: [{ type: Schema.Types.ObjectId, ref: 'User' }], // 存储着id数组，这些id 可以跟 User表 相关联！
+    // 【User表id 类型】数组，这些id 可以跟 User表 相关联！
+    type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     select : false
   }
 });

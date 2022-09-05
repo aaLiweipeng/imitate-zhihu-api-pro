@@ -148,6 +148,30 @@ class UsersCtl {
     ctx.body = { token };
   }
 
+  // 获取指定用户的 关注列表
+  async listFollowing(ctx){
+    const user = await User.findById(ctx.params.id)
+      .select("+ following") // 获取当前用户信息，带上 following数组属性
+      .populate("following");// 将following数组属性中的所有id元素，映射成User实体
+      
+    if (!user) { ctx.throw(404); }
+    ctx.body = user.following;
+  }
+
+  // 为 当前操作用户，添加【:id 对应的用户为】关注者
+  // auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
+  async follow(ctx) {
+    // 获取当前用户信息，带上 following数组属性
+    const currentUser = await User.findById(ctx.state.user._id).select('+following');
+
+    // 当前用户未关注这个id时，将关注者id加进去
+    // 因为following的类型是 koa提供的，需要用koa提供的toString转成基本String类型，才能进行对比
+    if (!currentUser.following.map(id => id.toString()).includes(ctx.params.id)) {
+      currentUser.following.push(ctx.params.id);
+      currentUser.save(); // 存进数据库！
+    }
+    ctx.status = 204;
+  }
 }
 
 module.exports = new UsersCtl();
