@@ -153,9 +153,16 @@ class UsersCtl {
     const user = await User.findById(ctx.params.id)
       .select("+ following") // 获取当前用户信息，带上 following数组属性
       .populate("following");// 将following数组属性中的所有id元素，映射成User实体
-      
+
     if (!user) { ctx.throw(404); }
     ctx.body = user.following;
+  }
+
+  // 获取指定用户的 粉丝
+  async listFollowers(ctx) {
+    // 从用户表中 查询那些 following包含我的，即关注我的，那就是我的粉丝
+    const follower = await User.find({ following: ctx.params.id });
+    ctx.body = follower;
   }
 
   // 为 当前操作用户，添加【:id 对应的用户为】关注者
@@ -169,6 +176,22 @@ class UsersCtl {
     if (!currentUser.following.map(id => id.toString()).includes(ctx.params.id)) {
       currentUser.following.push(ctx.params.id);
       currentUser.save(); // 存进数据库！
+    }
+    ctx.status = 204;
+  }
+
+  //取消关注
+  async unfollow(ctx) {
+    // 获取当前用户信息，带上 following数组属性
+    const currentUser = await User.findById(ctx.state.user._id).select('+following');
+
+    // 找到对应request参数id 在 当前用户的 关注者id列表中 的索引
+    const index = currentUser.following.map(id => id.toString()).indexOf(ctx.params.id);
+
+    // 如果 索引有意义，证明有关注这个人，现在取关
+    if (index > -1) {
+      currentUser.following.splice(index, 1);
+      currentUser.save();
     }
     ctx.status = 204;
   }

@@ -11,7 +11,9 @@ const {
   login,
   checkOwner,
   listFollowing,
+  listFollowers,
   follow,
+  unfollow,
 } = require("../controllers/users");
 
 const { mytokensecret } = require("../config");
@@ -74,14 +76,20 @@ usersRouter.patch("/:id", auth, checkOwner, update);
 
 usersRouter.delete("/:id", auth, checkOwner, del);
 
+// 登录
 usersRouter.post("/login", login);
 
 // 获取指定用户的 关注列表
 usersRouter.get("/:id/following", listFollowing);
+// 获取指定用户的 粉丝列表
+usersRouter.get("/:id/followers", listFollowers);
 
 // 为 auth对应的当前操作用户，添加【:id 对应的用户为】关注者
 // auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
 usersRouter.put("/following/:id", auth, follow);
+
+// 取关
+usersRouter.delete("/following/:id", auth, unfollow);
 
 // --------------
 
