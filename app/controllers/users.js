@@ -31,7 +31,8 @@ class UsersCtl {
   }
 
   async findById(ctx) {
-    const { fields } = ctx.query;
+    // 配置默认值为空字符串，避免用户没传该属性，导致空指针
+    const { fields = '' } = ctx.query;
 
     // filter(field => field)  过滤有实值的field元素 避免;;之间隔着空字符串
     const selectFields = fields
