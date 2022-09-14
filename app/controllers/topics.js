@@ -6,7 +6,12 @@ const Topic = require('../models/topics');
 
 class TopicsCtl {
   async find(ctx) {
-    ctx.body = await Topic.find();
+    const { per_page = 10 } = ctx.query; // 默认每页返回10
+    // *1 将字符串转为Number类型，max则用于处理离谱参数，保证结果最小为 1
+    // skipPage 需要跳过的页数
+    const skipPage = Math.max(ctx.query.page * 1, 1) - 1; 
+    const perPage = Math.max(per_page * 1, 1);
+    ctx.body = await Topic.find().limit(perPage).skip(skipPage * perPage);
   }
 
   async findById(ctx) {

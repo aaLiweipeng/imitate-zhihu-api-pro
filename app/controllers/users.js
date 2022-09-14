@@ -26,8 +26,12 @@ class UsersCtl {
     // 直接返回 整个数据对象
     // ctx.body = dbStorage;
 
+    // 分页处理
+    const { per_page = 10 } = ctx.query;
+    const skipPage = Math.max(ctx.query.page * 1, 1) - 1; 
+    const perPage = Math.max(per_page * 1, 1);
     // find 返回 usersSchema 整个列表的查询结果
-    ctx.body = await User.find();
+    ctx.body = await User.find().limit(perPage).skip(skipPage * perPage);
   }
 
   async findById(ctx) {
