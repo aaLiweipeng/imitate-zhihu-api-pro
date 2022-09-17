@@ -31,7 +31,9 @@ class UsersCtl {
     const skipPage = Math.max(ctx.query.page * 1, 1) - 1; 
     const perPage = Math.max(per_page * 1, 1);
     // find 返回 usersSchema 整个列表的查询结果
-    ctx.body = await User.find().limit(perPage).skip(skipPage * perPage);
+    ctx.body = await User.find({ name: new RegExp(ctx.query.q) })
+      .limit(perPage)
+      .skip(skipPage * perPage);
   }
 
   async findById(ctx) {

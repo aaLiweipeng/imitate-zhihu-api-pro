@@ -11,7 +11,9 @@ class TopicsCtl {
     // skipPage 需要跳过的页数
     const skipPage = Math.max(ctx.query.page * 1, 1) - 1; 
     const perPage = Math.max(per_page * 1, 1);
-    ctx.body = await Topic.find().limit(perPage).skip(skipPage * perPage);
+    ctx.body = await Topic.find({ name: new RegExp(ctx.query.q) })
+      .limit(perPage)
+      .skip(skipPage * perPage);
   }
 
   async findById(ctx) {
