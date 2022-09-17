@@ -41,14 +41,23 @@ class UsersCtl {
     const { fields = '' } = ctx.query;
 
     // filter(field => field)  过滤有实值的field元素 避免;;之间隔着空字符串
-    const selectFields = fields
-      .split(';')
-      .filter(field => field)
-      .map(field => ' +' + field)
-      .join('');
+    const fieldsReal = fields.split(";").filter((field) => field);
+
+    const selectFieldsStr = fieldsReal.map((field) => " +" + field).join("");
+    const populateStr = fieldsReal.map(field => {
+      if(field === 'employments'){
+        return "employments.company employments.job";
+      }
+      if(field === 'educations'){
+        return "educations.school educations.major";
+      }
+      return field;
+    }).join(' ')
 
     // findById 根据id 查询数据
-    const user = await User.findById(ctx.params.id).select(selectFields);
+    const user = await User.findById(ctx.params.id)
+      .select(selectFieldsStr)
+      .populate(populateStr);
     if (!user) {
       ctx.throw(404, "抱歉，您查询的用户不存在！");
     } // 如果找不到这个用户
