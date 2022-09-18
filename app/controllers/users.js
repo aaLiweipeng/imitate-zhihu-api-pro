@@ -8,7 +8,6 @@ const User = require('../models/users');// 引入 user Schema
 const { mytokensecret } = require("../config");
 
 class UsersCtl {
-
   // 进行权限判断 当前登录用户 只能 修改用户自身的信息
   async checkOwner(ctx, next) {
     // app\routes\users.js 中，认证成功的用户会存到 ctx.state.user 中
@@ -28,7 +27,7 @@ class UsersCtl {
 
     // 分页处理
     const { per_page = 10 } = ctx.query;
-    const skipPage = Math.max(ctx.query.page * 1, 1) - 1; 
+    const skipPage = Math.max(ctx.query.page * 1, 1) - 1;
     const perPage = Math.max(per_page * 1, 1);
     // find 返回 usersSchema 整个列表的查询结果
     ctx.body = await User.find({ name: new RegExp(ctx.query.q) })
@@ -38,21 +37,23 @@ class UsersCtl {
 
   async findById(ctx) {
     // 配置默认值为空字符串，避免用户没传该属性，导致空指针
-    const { fields = '' } = ctx.query;
+    const { fields = "" } = ctx.query;
 
     // filter(field => field)  过滤有实值的field元素 避免;;之间隔着空字符串
     const fieldsReal = fields.split(";").filter((field) => field);
 
     const selectFieldsStr = fieldsReal.map((field) => " +" + field).join("");
-    const populateStr = fieldsReal.map(field => {
-      if(field === 'employments'){
-        return "employments.company employments.job";
-      }
-      if(field === 'educations'){
-        return "educations.school educations.major";
-      }
-      return field;
-    }).join(' ')
+    const populateStr = fieldsReal
+      .map((field) => {
+        if (field === "employments") {
+          return "employments.company employments.job";
+        }
+        if (field === "educations") {
+          return "educations.school educations.major";
+        }
+        return field;
+      })
+      .join(" ");
 
     // findById 根据id 查询数据
     const user = await User.findById(ctx.params.id)
@@ -84,7 +85,9 @@ class UsersCtl {
     const { name } = ctx.request.body; // 取到请求数据中的name
     // findOne 查找数据库，返回符合条件的第一条记录
     const repeatedUser = await User.findOne({ name });
-    if (repeatedUser) { ctx.throw(409, '用户已存在，请重新定义用户名！') }
+    if (repeatedUser) {
+      ctx.throw(409, "用户已存在，请重新定义用户名！");
+    }
 
     // MongoDB存储
     // 直接把 client传过来的post数据 赋值到UserSchema类，
@@ -153,30 +156,36 @@ class UsersCtl {
     });
 
     // 校验数据内容
-    const user = await User.findOne(ctx.request.body)
-    if (!user) { ctx.throw(401, '用户名或密码不正确'); }
+    const user = await User.findOne(ctx.request.body);
+    if (!user) {
+      ctx.throw(401, "用户名或密码不正确");
+    }
 
     // 组装不敏感信息，生成token
     // expiresIn 有效时长【过期时限】
     const { _id, name } = user;
-    const token = jsonwebtoken.sign({ _id, name }, mytokensecret, {expiresIn: '1d'});
+    const token = jsonwebtoken.sign({ _id, name }, mytokensecret, {
+      expiresIn: "1d",
+    });
     // 把 token 返回给客户端
     ctx.body = { token };
   }
 
   // 获取指定用户的 关注列表
-  async listFollowing(ctx){
+  async listFollowing(ctx) {
     const user = await User.findById(ctx.params.id)
       .select("+ following") // 获取当前用户信息，带上 following数组属性
-      .populate("following");// 将following数组属性中的所有id元素，映射成User实体
+      .populate("following"); // 将following数组属性中的所有id元素，映射成User实体
 
-    if (!user) { ctx.throw(404); }
+    if (!user) {
+      ctx.throw(404, "当前用户没有关注他人！");
+    }
     ctx.body = user.following;
   }
 
   // 获取指定用户的 粉丝
   async listFollowers(ctx) {
-    // 从用户表中 查询那些 following包含我的，即关注我的，那就是我的粉丝
+    // 从用户表中 查询那些 following包含我的id的，即关注我的，那就是我的粉丝
     const follower = await User.find({ following: ctx.params.id });
     ctx.body = follower;
   }
@@ -184,19 +193,25 @@ class UsersCtl {
   // 校验中间件，校验用户是否存在
   async checkUserExist(ctx, next) {
     const user = await User.findById(ctx.params.id);
-    if (!user) { ctx.throw(404, '用户不存在'); }
+    if (!user) {
+      ctx.throw(404, "用户不存在");
+    }
     await next();
   }
-
+  // 关注 接口
   // 为 当前操作用户，添加【:id 对应的用户为】关注者
   // auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
   async follow(ctx) {
     // 获取当前用户信息，带上 following数组属性
-    const currentUser = await User.findById(ctx.state.user._id).select('+following');
+    const currentUser = await User.findById(ctx.state.user._id).select(
+      "+following"
+    );
 
     // 当前用户未关注这个id时，将关注者id加进去
     // 因为following的类型是 koa提供的，需要用koa提供的toString转成基本String类型，才能进行对比
-    if (!currentUser.following.map(id => id.toString()).includes(ctx.params.id)) {
+    if (
+      !currentUser.following.map((id) => id.toString()).includes(ctx.params.id)
+    ) {
       currentUser.following.push(ctx.params.id);
       currentUser.save(); // 存进数据库！
     }
@@ -205,15 +220,64 @@ class UsersCtl {
 
   //取消关注
   async unfollow(ctx) {
-    // 获取当前用户信息，带上 following数组属性
-    const currentUser = await User.findById(ctx.state.user._id).select('+following');
+    // 获取当前调用接口的用户信息，带上 following数组属性
+    const currentUser = await User.findById(ctx.state.user._id).select(
+      "+following"
+    );
 
     // 找到对应request参数id 在 当前用户的 关注者id列表中 的索引
-    const index = currentUser.following.map(id => id.toString()).indexOf(ctx.params.id);
+    const index = currentUser.following
+      .map((id) => id.toString())
+      .indexOf(ctx.params.id);
 
     // 如果 索引有意义，证明有关注这个人，现在取关
     if (index > -1) {
       currentUser.following.splice(index, 1);
+      currentUser.save();
+    }
+    ctx.status = 204;
+  }
+
+  // 获取指定用户的 关注话题列表
+  async listFollowingTopics(ctx) {
+    const user = await User.findById(ctx.params.id)
+      .select("+ followingTopics") // 获取当前用户信息，带上 followingTopics数组属性
+      .populate("followingTopics"); // 将ffollowingTopics数组属性中的所有id元素，映射成User实体
+
+    if (!user) {
+      ctx.throw(404, "当前用户没有关注任何话题！");
+    }
+    ctx.body = user.followingTopics;
+  }
+  // 关注话题
+  async followTopic(ctx) {
+    const currentUser = await User.findById(ctx.state.user._id).select(
+      "+followingTopics"
+    );
+
+    if (
+      !currentUser.followingTopics
+        .map((id) => id.toString())
+        .includes(ctx.params.id)
+    ) {
+      currentUser.followingTopics.push(ctx.params.id);
+      currentUser.save(); // 存进数据库！
+    }
+    ctx.status = 204;
+  }
+
+  // 取消关注话题
+  async unfollowTopic(ctx) {
+    const currentUser = await User.findById(ctx.state.user._id).select(
+      "+followingTopics"
+    );
+
+    const index = currentUser.followingTopics
+      .map((id) => id.toString())
+      .indexOf(ctx.params.id);
+
+    if (index > -1) {
+      currentUser.followingTopics.splice(index, 1);
       currentUser.save();
     }
     ctx.status = 204;

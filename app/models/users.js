@@ -56,6 +56,10 @@ const usesrSchema = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: "User" }],
     select: false,
   },
+  followingTopics: {
+    type: [{ type: Schema.Types.ObjectId, ref: "Topic" }],
+    select: false,
+  },
 });
 
 // 定义 Schema文档 对应的【文档集合标识】

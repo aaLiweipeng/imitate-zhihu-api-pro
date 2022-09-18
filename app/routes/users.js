@@ -15,7 +15,12 @@ const {
   checkUserExist,
   follow,
   unfollow,
+  followTopic,
+  unfollowTopic,
+  listFollowingTopics,
 } = require("../controllers/users");
+
+const { checkTopicExist } = require("../controllers/topics");
 
 const { mytokensecret } = require("../config");
 
@@ -88,9 +93,14 @@ usersRouter.get("/:id/followers", listFollowers);
 // 为 auth对应的当前操作用户，添加【:id 对应的用户为】关注者
 // auth可以得知是哪个用户在操作，这里就不需要再加操作者id了
 usersRouter.put("/following/:id", auth, checkUserExist, follow);
-
 // 取关
 usersRouter.delete("/following/:id", auth, checkUserExist, unfollow);
+
+// 获取指定用户的 关注话题列表
+usersRouter.get("/:id/followingTopics", listFollowingTopics);
+usersRouter.put("/followingTopic/:id", auth, checkTopicExist, followTopic);
+// 取关话题
+usersRouter.delete("/followingTopic/:id", auth, checkTopicExist, unfollowTopic);
 
 // --------------
 
